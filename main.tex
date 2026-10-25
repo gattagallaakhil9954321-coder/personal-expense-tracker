@@ -1,0 +1,230 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesection}{\arabic{section}}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
+\setstretch{1.15}
+\begin{document}
+\begin{titlepage}
+\centering
+\includegraphics[width=3.4cm,height=2.6cm]{College Logo Grayscale.jpg}\\[0.5cm]
+\vspace{0.5cm}
+{\large\textbf{A Course End Project Report on}}\\[0.5cm]
+{\LARGE\textbf{Personal Expense Tracker}}\\[1.0cm]
+{\Large Course End Project}\\[1.2cm]
+\textbf{Submitted by}\\[0.25cm]
+\begin{tabular}{ll}
+Name of the Student: & Akhil\\[2mm]
+Roll Number: & 25881A05CC\\[2mm]
+Class/Section: & CSE-G\\
+\end{tabular}\\[1.1cm]
+\textbf{Course Facilitator}\\[0.15cm]
+Name: \underline{\hspace{6cm}}\\
+Designation: \underline{\hspace{5.2cm}}\\[1.5cm]
+{\large\textbf{Department of Computer Science and Engineering}}\\[0.3cm]
+{\large\textbf{Vardhaman College of Engineering, Hyderabad}}\\[0.5cm]
+{\large\textbf{October 2026}}
+\end{titlepage}
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+Managing day-to-day spending can be difficult when purchases are recorded informally or not recorded at all. The Personal Expense Tracker is a lightweight web application designed to help an individual record, review and organize expenses from one place. The application is implemented using Python and Flask for application routing, SQLite for persistent local storage, and HTML and CSS for the user interface. A user can add an expense with a title, amount, category, date and optional note; view overall and current-day spending; review totals by category; search and filter transactions; delete an entry; and export records as a CSV file for spreadsheet analysis. The database is created automatically when the application starts, reducing setup effort. The application is designed for local use and demonstrates basic web development, input validation, database operations and data presentation. It can be extended with authentication, budgets, monthly analytics and cloud storage. The current version is a student project and is not intended to provide multi-user security or financial advice.\\[0.2cm]
+\noindent\textbf{Keywords:} Personal Expense Tracker, Flask, Python, SQLite, expense management, CSV export, web application.
+\clearpage
+\pagenumbering{arabic}
+\section{Introduction}
+Personal budgeting starts with understanding where money is spent. When expenses are tracked in notebooks or scattered notes, it can be difficult to search previous entries, compare categories or calculate totals. A digital expense tracker can make these tasks more consistent by keeping records in a structured database and providing quick summaries.
+
+The Personal Expense Tracker is a browser-based application that runs locally on a computer. It provides a simple interface for entering expenses and reviewing saved transactions. The project combines a Python backend, a relational database and a responsive web interface. It is intended as an educational project demonstrating how a small full-stack application can solve a practical everyday problem.
+
+\section{Problem Statement}
+Users may forget small purchases or find it inconvenient to calculate their spending manually. Paper records and unstructured notes do not easily support filtering, category-wise totals or export. The problem addressed by this project is to provide a simple, low-cost tool for recording personal expenses and retrieving useful summaries without requiring a paid service.
+
+\section{Objectives}
+\begin{itemize}[leftmargin=*]
+\item To develop a simple and responsive web application for personal expense recording.
+\item To store expense details persistently using an SQLite database.
+\item To calculate total spending, today's spending and the number of transactions.
+\item To group recorded expenses by category and display their relative totals.
+\item To support searching and filtering by text, category and date range.
+\item To allow users to delete records and export transactions to CSV format.
+\item To apply basic validation and parameterized database queries.
+\end{itemize}
+
+\section{Literature Review}
+Common approaches to expense tracking include paper ledgers, spreadsheet templates, mobile finance applications and web-based budgeting tools. Paper records are easy to start but require manual calculations. Spreadsheets support formulas and charts but may require users to maintain their own structure. Full-featured finance applications may provide synchronization and bank integration, but can introduce account setup, privacy and service-dependency concerns.
+
+This project focuses on a smaller local-first implementation. Flask provides URL routing and request handling with a compact Python application structure, while SQLite stores data in a local relational database without requiring a separate database server. CSV export enables further analysis in spreadsheet software. Compared with a full commercial budgeting platform, this version deliberately limits its scope and does not connect to bank accounts.
+
+\section{System Requirements}
+\subsection{Hardware Requirements}
+\begin{itemize}[leftmargin=*]
+\item A desktop computer or laptop capable of running Python.
+\item At least 2 GB RAM recommended for normal development use.
+\item Keyboard, pointing device and a display.
+\end{itemize}
+\subsection{Software Requirements}
+\begin{itemize}[leftmargin=*]
+\item Operating system: Windows, Linux or macOS.
+\item Python 3.10 or newer.
+\item Flask web framework.
+\item SQLite database engine (included with standard Python builds).
+\item A modern web browser and a code editor or terminal.
+\end{itemize}
+
+\section{Methodology and System Design}
+\subsection{System Architecture}
+The application follows a simple three-part architecture. The presentation layer is an HTML page styled with CSS. The application layer is a Flask server that validates input, processes requests and prepares summaries. The data layer is SQLite, which stores each expense as a row. The browser sends form submissions to Flask, Flask performs a database operation and then redirects the browser to the updated page.
+
+\begin{figure}[ht]
+\centering
+\fbox{\begin{minipage}{0.88\linewidth}
+\centering
+\textbf{User / Web Browser}\\[0.2cm]
+\textit{HTML forms, filters and transaction table}\\[0.35cm]
+$\Downarrow$ HTTP request / HTML response\\[0.35cm]
+\textbf{Flask Application (Python)}\\[0.2cm]
+\textit{Validation, routing, totals, search and CSV export}\\[0.35cm]
+$\Updownarrow$ SQL queries\\[0.35cm]
+\textbf{SQLite Database}\\[0.2cm]
+\textit{expenses table: title, amount, category, date, note}
+\end{minipage}}
+\caption{High-level architecture of the Personal Expense Tracker.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Database Design}
+The database contains an \texttt{expenses} table. The \texttt{id} field is an auto-incrementing primary key. The \texttt{title}, \texttt{amount}, \texttt{category} and \texttt{expense\_date} fields store required information, while \texttt{note} is optional. The amount must be positive. The table is created automatically at application startup if it does not already exist.
+
+\begin{longtable}{|p{3.2cm}|p{2.4cm}|p{7.0cm}|}
+\caption{Expense table fields}\\\hline
+\textbf{Field} & \textbf{Type} & \textbf{Purpose}\\\hline
+\endfirsthead
+\hline \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\\hline
+\endhead
+id & INTEGER & Primary key; uniquely identifies each record.\\\hline
+title & TEXT & Short description of the expense.\\\hline
+amount & REAL & Expense amount; must be greater than zero.\\\hline
+category & TEXT & Spending category selected by the user.\\\hline
+expense\_date & TEXT & Date of the expense in ISO format (YYYY-MM-DD).\\\hline
+note & TEXT & Optional additional description.\\\hline
+\end{longtable}
+
+\subsection{Main Modules}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Expense entry:} accepts title, amount, category, date and optional note.
+\item \textbf{Dashboard:} calculates total spending, today's spending and transaction count.
+\item \textbf{Category summary:} groups records by category and displays totals with proportional bars.
+\item \textbf{Search and filtering:} filters by title or note, category and date range.
+\item \textbf{Delete operation:} removes a selected record after a browser confirmation.
+\item \textbf{CSV export:} creates a downloadable CSV file containing the saved records.
+\end{enumerate}
+
+\subsection{Workflow}
+\begin{enumerate}[leftmargin=*]
+\item The user opens the local application in a browser.
+\item The user enters expense details and submits the form.
+\item The Flask route validates required fields and checks that the amount is positive.
+\item A parameterized SQL statement stores the record in SQLite.
+\item The page reloads and displays refreshed totals, category summaries and transactions.
+\item The user may search, filter, delete a record or export the records to CSV.
+\end{enumerate}
+
+\section{Implementation}
+\subsection{Technology Stack}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Python:} backend language and data processing.
+\item \textbf{Flask:} handles routes, form submissions, templates and feedback messages.
+\item \textbf{SQLite:} local persistence for expense records.
+\item \textbf{HTML:} page structure, input forms and transaction table.
+\item \textbf{CSS:} responsive layout, cards, category bars and table styling.
+\item \textbf{CSV module:} generates a downloadable spreadsheet-compatible file.
+\end{itemize}
+
+\subsection{Input Validation and Data Handling}
+The application checks that the title and date are supplied, the amount can be converted to a number and the amount is greater than zero. The selected category must be one of the supported categories. Database commands use placeholders for user-supplied values, which reduces SQL injection risk. The CSV export uses Python's CSV writer so commas and quoted text in notes are handled correctly.
+
+\subsection{How to Run the Application}
+\begin{enumerate}[leftmargin=*]
+\item Install Python 3.10 or newer.
+\item Open a terminal in the project directory.
+\item Install dependencies using \texttt{pip install -r requirements.txt}.
+\item Run \texttt{python app.py}.
+\item Open \url{http://127.0.0.1:5000} in a browser.
+\end{enumerate}
+The SQLite database file is generated locally. The database is excluded from version control so private transaction records are not unintentionally uploaded to a public repository.
+
+\section{Testing and Discussion}
+The following test cases define the expected behavior and should be executed on the final machine before submission. Results should be updated if actual testing produces a different outcome.
+\begin{longtable}{|p{0.7cm}|p{4.2cm}|p{4.3cm}|p{3.1cm}|}
+\caption{Functional test cases}\\\hline
+\textbf{No.} & \textbf{Test} & \textbf{Expected result} & \textbf{Status}\\\hline
+\endfirsthead
+\hline \textbf{No.} & \textbf{Test} & \textbf{Expected result} & \textbf{Status}\\\hline
+\endhead
+1 & Add a valid expense & Record is saved and appears in the transaction list. & To be verified\\\hline
+2 & Submit an empty title & Validation message is displayed; no record is inserted. & To be verified\\\hline
+3 & Enter zero or negative amount & Entry is rejected with a validation message. & To be verified\\\hline
+4 & Filter by category & Only matching category records are displayed. & To be verified\\\hline
+5 & Search by title or note & Matching records are displayed. & To be verified\\\hline
+6 & Delete a record & Selected record is removed after confirmation. & To be verified\\\hline
+7 & Export CSV & Browser downloads a CSV with column headings and records. & To be verified\\\hline
+8 & Restart the application & Previously saved records remain in SQLite. & To be verified\\\hline
+\end{longtable}
+
+The application is intended to make common expense-recording tasks available from one page. Its local database avoids the need to configure an external database server. However, the current implementation does not provide user login, encryption at rest, cloud synchronization, edit-existing-record functionality or automatic bank imports. Since data is local, users should back up the database file if they need to preserve records; the file should not be committed to a public repository.
+
+\section{Mapping of Program Outcomes and Sustainable Development Goals}
+\subsection{Program Outcomes (POs) Mapping}
+\begin{longtable}{|p{1.5cm}|p{4.4cm}|p{6.7cm}|}
+\caption{Program outcome mapping}\\\hline
+\textbf{PO} & \textbf{Outcome area} & \textbf{Project relevance}\\\hline
+\endfirsthead
+\hline \textbf{PO} & \textbf{Outcome area} & \textbf{Project relevance}\\\hline
+\endhead
+PO1 & Engineering knowledge & Applies programming, database and web-development concepts.\\\hline
+PO2 & Problem analysis & Identifies difficulties in manual expense tracking and retrieval.\\\hline
+PO3 & Design/development of solutions & Designs a working application with entry, summary and export modules.\\\hline
+PO5 & Modern tool usage & Uses Python, Flask, SQLite, HTML and CSS.\\\hline
+PO8 & Ethics & Highlights responsible handling of personal financial records and repository privacy.\\\hline
+\end{longtable}
+\subsection{Sustainable Development Goals (SDGs) Mapping}
+\begin{longtable}{|p{1.7cm}|p{4.7cm}|p{6.2cm}|}
+\caption{SDG mapping}\\\hline
+\textbf{SDG} & \textbf{Goal} & \textbf{Project relevance}\\\hline
+\endfirsthead
+\hline \textbf{SDG} & \textbf{Goal} & \textbf{Project relevance}\\\hline
+\endhead
+SDG 4 & Quality Education & Supports practical learning in programming and data management.\\\hline
+SDG 8 & Decent Work and Economic Growth & Encourages basic financial awareness and organized expense records.\\\hline
+SDG 12 & Responsible Consumption and Production & Helps users review spending patterns and make more informed consumption choices.\\\hline
+\end{longtable}
+
+\section{Conclusion and Future Enhancements}
+The Personal Expense Tracker presents a simple local web application for recording and reviewing individual expenses. It combines a Flask backend, SQLite persistence and a responsive HTML/CSS interface. Its planned core functions include adding records, viewing spending summaries, filtering transactions, deleting entries and exporting data to CSV. The modular structure makes the application suitable for further development and academic demonstration.
+
+Future enhancements may include user authentication, editing saved expenses, monthly charts, budget limits and alerts, recurring transactions, automated test coverage, secure backups and cloud database support. Before using the application with sensitive real-world financial information or deploying it publicly, authentication and additional security controls should be implemented.
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+\bibitem{flask} Pallets Projects, ``Flask Documentation.'' Available: \url{https://flask.palletsprojects.com/}. Accessed October 2026.
+\bibitem{python} Python Software Foundation, ``Python 3 Documentation.'' Available: \url{https://docs.python.org/3/}. Accessed October 2026.
+\bibitem{sqlite} SQLite Consortium, ``SQLite Documentation.'' Available: \url{https://www.sqlite.org/docs.html}. Accessed October 2026.
+\bibitem{mdn} MDN Web Docs, ``HTML: HyperText Markup Language.'' Available: \url{https://developer.mozilla.org/en-US/docs/Web/HTML}. Accessed October 2026.
+\bibitem{git} GitHub Docs, ``About repositories.'' Available: \url{https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories}. Accessed October 2026.
+\end{thebibliography}
+\end{document}
